@@ -7,10 +7,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
+    Optional<Account> findByAccountNumber(String accountNumber);
+
+    void deleteByAccountNumber(String accountNumber);
     /**
      * Find all accounts belonging to a specific customer
      *

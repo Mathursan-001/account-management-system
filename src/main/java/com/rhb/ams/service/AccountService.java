@@ -8,6 +8,7 @@ import com.rhb.ams.entity.Customer;
 import com.rhb.ams.repository.AccountRepository;
 import com.rhb.ams.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +21,26 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final CustomerRepository customerRepository;
+
+    /**
+     * Create a new account
+     *
+     * @param accountRequestDTO Account data transfer object
+     * @return Created account response DTO
+     */
+    public AccountResponseDTO createAccount(AccountRequestDTO accountRequestDTO) {
+        Customer customer = customerRepository.findById(accountRequestDTO.getCustomerId())
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found with ID: " + accountRequestDTO.getCustomerId()));
+
+        Account account = Account.builder()
+                .accountNumber(generateAccountNumber())
+                .balance(accountRequestDTO.getBalance())
+                .customer(customer)
+                .build();
+
+        Account savedAccount = accountRepository.save(account);
+        return convertToResponseDTO(savedAccount);
+    }
 
     /**
      * Get all accounts
@@ -35,31 +56,11 @@ public class AccountService {
     /**
      * Get account by ID
      *
-     * @param id Account ID
+     * @param accountNumber Account ID
      * @return Optional containing the account response DTO if found
      */
-    public Optional<AccountResponseDTO> getAccountById(Long id) {
-        return accountRepository.findById(id).map(this::convertToResponseDTO);
-    }
-
-    /**
-     * Create a new account
-     *
-     * @param accountRequestDTO Account data transfer object
-     * @return Created account response DTO
-     */
-    public AccountResponseDTO createAccount(AccountRequestDTO accountRequestDTO) {
-        Customer customer = customerRepository.findById(accountRequestDTO.getCustomerId())
-                .orElseThrow(() -> new IllegalArgumentException("Customer not found with ID: " + accountRequestDTO.getCustomerId()));
-
-        Account account = Account.builder()
-                .accountNumber(accountRequestDTO.getAccountNumber())
-                .balance(accountRequestDTO.getBalance())
-                .customer(customer)
-                .build();
-
-        Account savedAccount = accountRepository.save(account);
-        return convertToResponseDTO(savedAccount);
+    public Optional<AccountResponseDTO> getAccountByAccountNumber(String accountNumber) {
+         return accountRepository.findByAccountNumber(accountNumber).map(this::convertToResponseDTO);
     }
 
     /**
@@ -71,9 +72,7 @@ public class AccountService {
      */
     public Optional<AccountResponseDTO> updateAccount(Long id, AccountRequestDTO accountRequestDTO) {
         return accountRepository.findById(id).map(existingAccount -> {
-            if (accountRequestDTO.getAccountNumber() != null) {
-                existingAccount.setAccountNumber(accountRequestDTO.getAccountNumber());
-            }
+
             if (accountRequestDTO.getBalance() != null) {
                 existingAccount.setBalance(accountRequestDTO.getBalance());
             }
@@ -90,10 +89,10 @@ public class AccountService {
     /**
      * Delete an account by ID
      *
-     * @param id Account ID
+     * @param accountNumber Account ID
      */
-    public void deleteAccount(Long id) {
-        accountRepository.deleteById(id);
+    public void deleteAccount(String accountNumber) {
+        accountRepository.deleteByAccountNumber(accountNumber);
     }
 
     /**
@@ -129,4 +128,12 @@ public class AccountService {
                 .customer(customerDTO)
                 .build();
     }
+
+    private String generateAccountNumber() {
+        long min = 10000000L;
+        long max = 9999999999L;
+        long randomNumber = min + (long) (Math.random() * (max - min + 1));
+        return "ACC" + randomNumber;
+    }
+
 }

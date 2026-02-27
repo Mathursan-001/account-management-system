@@ -2,6 +2,7 @@ package com.rhb.ams.controller;
 
 import com.rhb.ams.dto.AccountRequestDTO;
 import com.rhb.ams.dto.AccountResponseDTO;
+import com.rhb.ams.entity.Account;
 import com.rhb.ams.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/accounts")
@@ -53,8 +55,8 @@ public class AccountController {
      * @return Account response DTO if found, otherwise 404
      */
     @GetMapping("/{id}")
-    public ResponseEntity<AccountResponseDTO> getAccountById(@PathVariable Long id) {
-        return accountService.getAccountById(id)
+    public ResponseEntity<AccountResponseDTO> getAccountById(@PathVariable String id) {
+        return accountService.getAccountByAccountNumber(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -78,17 +80,14 @@ public class AccountController {
     }
 
     /**
-     * Delete an account by ID
+     * Delete an account by account number
      *
-     * @param id Account ID
+     * @param accountNumber Account number (e.g., ACC12345678)
      * @return 204 No Content if successful, 404 if not found
      */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAccount(@PathVariable Long id) {
-        if (accountService.getAccountById(id).isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        accountService.deleteAccount(id);
+    @DeleteMapping("/{accountNumber}")
+    public ResponseEntity<Void> deleteAccount(@PathVariable String accountNumber) {
+        accountService.deleteAccount(accountNumber);
         return ResponseEntity.noContent().build();
     }
 

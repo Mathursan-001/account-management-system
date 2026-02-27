@@ -16,9 +16,6 @@ import java.math.BigDecimal;
 @Builder
 public class AccountRequestDTO {
 
-    @NotBlank(message = "Account number is required")
-    private String accountNumber;
-
     @NotNull(message = "Balance is required")
     @DecimalMin(value = "0.0", message = "Balance must be greater than or equal to 0")
     private BigDecimal balance;

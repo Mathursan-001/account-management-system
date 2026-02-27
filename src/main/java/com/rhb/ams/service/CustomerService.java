@@ -10,7 +10,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -85,6 +88,44 @@ public class CustomerService {
      */
     public void deleteCustomer(Long id) {
         customerRepository.deleteById(id);
+    }
+
+    /**
+     * Generate random customers in bulk
+     *
+     * @param count Number of customers to generate
+     * @return List of created customer response DTOs
+     */
+    public List<CustomerResponseDTO> generateRandomCustomers(int count) {
+        List<Customer> customersToSave = new ArrayList<>();
+        Random random = new Random();
+        String[] firstNames = {"John", "Jane", "Michael", "Emily", "David", "Sarah", "Robert", "Jessica", "James", "Laura",
+                               "William", "Mary", "Richard", "Patricia", "Charles", "Jennifer", "Daniel", "Linda", "Matthew", "Barbara"};
+        String[] lastNames = {"Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez",
+                              "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin"};
+        String[] domains = {"gmail.com", "yahoo.com", "outlook.com", "company.com", "mail.com", "example.com", "test.com", "domain.com"};
+
+        for (int i = 0; i < count; i++) {
+            String firstName = firstNames[random.nextInt(firstNames.length)];
+            String lastName = lastNames[random.nextInt(lastNames.length)];
+            String name = firstName + " " + lastName;
+            String email = (firstName.toLowerCase() + "." + lastName.toLowerCase() + i + "@" + domains[random.nextInt(domains.length)]);
+
+            Customer customer = Customer.builder()
+                    .name(name)
+                    .email(email)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+
+            customersToSave.add(customer);
+        }
+
+        List<Customer> savedCustomers = customerRepository.saveAll(customersToSave);
+        List<CustomerResponseDTO> responseDTOs = new ArrayList<>();
+        for (Customer customer : savedCustomers) {
+            responseDTOs.add(convertToResponseDTO(customer));
+        }
+        return responseDTOs;
     }
 
     /**

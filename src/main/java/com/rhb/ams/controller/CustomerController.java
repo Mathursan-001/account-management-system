@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/customers")
@@ -23,7 +24,7 @@ import java.time.format.DateTimeFormatter;
 public class CustomerController {
 
     private final CustomerService customerService;
-    private final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 
     /**
@@ -110,5 +111,28 @@ public class CustomerController {
         }
         customerService.deleteCustomer(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Generate hundreds of random customers
+     *
+     * @param count Number of random customers to generate (default: 100, max: 1000)
+     * @return List of created customer response DTOs with HTTP 201
+     */
+    @PostMapping("/generate-random")
+    public ResponseEntity<List<CustomerResponseDTO>> generateRandomCustomers(
+            @RequestParam(defaultValue = "100") int count) {
+
+        // Limit to maximum 1000 customers per request
+        if (count > 500) {
+            count = 500;
+        }
+
+        if (count < 1) {
+            count = 1;
+        }
+
+        List<CustomerResponseDTO> generatedCustomers = customerService.generateRandomCustomers(count);
+        return ResponseEntity.status(HttpStatus.CREATED).body(generatedCustomers);
     }
 }
