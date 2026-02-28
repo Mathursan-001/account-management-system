@@ -36,15 +36,17 @@ class CustomerControllerTest {
     @Test
     void shouldCreateCustomer() throws Exception {
 
-        CustomerRequestDTO request = new CustomerRequestDTO();
-        request.setName("John");
-        request.setEmail("john@test.com");
+        CustomerRequestDTO request = CustomerRequestDTO.builder()
+                .name("John")
+                .email("john@test.com")
+                .build();
 
 
-        CustomerResponseDTO response = new CustomerResponseDTO();
-        response.setId(1L);
-        response.setName("John");
-        response.setEmail("john@test.com");
+        CustomerResponseDTO response = CustomerResponseDTO.builder()
+                .id(1L)
+                .name("John")
+                .email("john@test.com")
+                .build();
 
         Mockito.when(customerService.createCustomer(any()))
                 .thenReturn(response);
@@ -60,9 +62,10 @@ class CustomerControllerTest {
     @Test
     void shouldReturnCustomerById() throws Exception {
 
-        CustomerResponseDTO response = new CustomerResponseDTO();
-        response.setId(1L);
-        response.setName("John");
+        CustomerResponseDTO response = CustomerResponseDTO.builder()
+                .id(1L)
+                .name("John")
+                .build();
 
         Mockito.when(customerService.getCustomerById(1L))
                 .thenReturn(Optional.of(response));
@@ -90,6 +93,11 @@ class CustomerControllerTest {
         customer.setId(1L);
         customer.setName("John");
 
+        customer = CustomerResponseDTO.builder()
+                .id(1L)
+                .name("John")
+                .build();
+
         Page<CustomerResponseDTO> page =
                 new PageImpl<>(List.of(customer), PageRequest.of(0, 20), 1);
 
@@ -108,13 +116,15 @@ class CustomerControllerTest {
     @Test
     void shouldUpdateCustomer() throws Exception {
 
-        CustomerRequestDTO request = new CustomerRequestDTO();
-        request.setName("Updated");
-        request.setEmail("update@rmail.com");
+        CustomerRequestDTO request = CustomerRequestDTO.builder()
+                .name("Updated")
+                .email("update@rmail.com")
+                .build();
 
-        CustomerResponseDTO response = new CustomerResponseDTO();
-        response.setId(1L);
-        response.setName("Updated");
+        CustomerResponseDTO response = CustomerResponseDTO.builder()
+                .id(1L)
+                .name("Updated")
+                .build();
 
         Mockito.when(customerService.updateCustomer(eq(1L), any()))
                 .thenReturn(Optional.of(response));
@@ -142,14 +152,16 @@ class CustomerControllerTest {
     @Test
     void shouldReturnCustomerWithAccounts() throws Exception {
 
-        AccountSummaryDTO account = new AccountSummaryDTO();
-        account.setId(10L);
-        account.setAccountNumber("ACC001");
+        AccountSummaryDTO account = AccountSummaryDTO.builder()
+                .id(10L)
+                .accountNumber("ACC001")
+                .build();
 
-        CustomerWithAccountsDTO dto = new CustomerWithAccountsDTO();
-        dto.setId(1L);
-        dto.setName("John");
-        dto.setAccounts(List.of(account));
+        CustomerWithAccountsDTO dto = CustomerWithAccountsDTO.builder()
+                .id(1L)
+                .name("John")
+                .accounts(List.of(account))
+                .build();
 
         Mockito.when(customerService.getCustomerWithAccounts(1L))
                 .thenReturn(dto);
@@ -163,9 +175,10 @@ class CustomerControllerTest {
     @Test
     void shouldGenerateRandomCustomers() throws Exception {
 
-        CustomerResponseDTO customer = new CustomerResponseDTO();
-        customer.setId(1L);
-        customer.setName("Random");
+        CustomerResponseDTO customer = CustomerResponseDTO.builder()
+                .id(1L)
+                .name("Random")
+                .build();
 
         Mockito.when(customerService.generateRandomCustomers(5))
                 .thenReturn(List.of(customer));

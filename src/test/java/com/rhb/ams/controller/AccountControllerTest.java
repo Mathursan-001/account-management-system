@@ -36,15 +36,17 @@ class AccountControllerTest {
     @Test
     void shouldCreateAccount() throws Exception {
 
-        AccountRequestDTO requestDTO = new AccountRequestDTO();
-        requestDTO.setBalance(BigDecimal.valueOf(1000));
-        requestDTO.setCustomerId(1L);
+        AccountRequestDTO requestDTO = AccountRequestDTO.builder()
+                .balance(BigDecimal.valueOf(1000))
+                .customerId(1L)
+                .build();
 
-        AccountResponseDTO responseDTO = new AccountResponseDTO();
-        responseDTO.setId(1L);
-        responseDTO.setAccountNumber("ACC123");
-        responseDTO.setBalance(BigDecimal.valueOf(1000));
-        responseDTO.setCustomerId(1L);
+        AccountResponseDTO responseDTO = AccountResponseDTO.builder()
+                .id(1L)
+                .accountNumber("ACC123")
+                .balance(BigDecimal.valueOf(1000))
+                .customerId(1L)
+                .build();
 
         Mockito.when(accountService.createAccount(any(AccountRequestDTO.class)))
                 .thenReturn(responseDTO);
@@ -60,11 +62,12 @@ class AccountControllerTest {
     @Test
     void shouldReturnAllAccounts() throws Exception {
 
-        AccountResponseDTO account = new AccountResponseDTO();
-        account.setId(1L);
-        account.setAccountNumber("ACC123");
-        account.setBalance(BigDecimal.valueOf(1000));
-        account.setCustomerId(1L);
+        AccountResponseDTO account = AccountResponseDTO.builder()
+                .id(1L)
+                .accountNumber("ACC123")
+                .balance(BigDecimal.valueOf(1000))
+                .customerId(1L)
+                .build();
 
         Mockito.when(accountService.getAllAccounts())
                 .thenReturn(List.of(account));
@@ -77,11 +80,12 @@ class AccountControllerTest {
     @Test
     void shouldReturnAccountByAccountNumber() throws Exception {
 
-        AccountResponseDTO account = new AccountResponseDTO();
-        account.setId(1L);
-        account.setAccountNumber("ACC123");
-        account.setBalance(BigDecimal.valueOf(1000));
-        account.setCustomerId(1L);
+        AccountResponseDTO account = AccountResponseDTO.builder()
+                .id(1L)
+                .accountNumber("ACC123")
+                .balance(BigDecimal.valueOf(1000))
+                .customerId(1L)
+                .build();
 
         Mockito.when(accountService.getAccountByAccountNumber("ACC123"))
                 .thenReturn(Optional.of(account));
