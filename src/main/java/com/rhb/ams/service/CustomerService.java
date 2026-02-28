@@ -2,18 +2,19 @@ package com.rhb.ams.service;
 
 import com.rhb.ams.dto.CustomerRequestDTO;
 import com.rhb.ams.dto.CustomerResponseDTO;
+import com.rhb.ams.dto.ExternalResponseDTO;
 import com.rhb.ams.entity.Customer;
 import com.rhb.ams.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import tools.jackson.databind.JsonNode;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -64,7 +65,7 @@ public class CustomerService {
     /**
      * Update an existing customer
      *
-     * @param id                   Customer ID
+     * @param id                 Customer ID
      * @param customerRequestDTO Customer updated data
      * @return Updated customer response DTO
      */
@@ -100,9 +101,9 @@ public class CustomerService {
         List<Customer> customersToSave = new ArrayList<>();
         Random random = new Random();
         String[] firstNames = {"John", "Jane", "Michael", "Emily", "David", "Sarah", "Robert", "Jessica", "James", "Laura",
-                               "William", "Mary", "Richard", "Patricia", "Charles", "Jennifer", "Daniel", "Linda", "Matthew", "Barbara"};
+                "William", "Mary", "Richard", "Patricia", "Charles", "Jennifer", "Daniel", "Linda", "Matthew", "Barbara"};
         String[] lastNames = {"Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez",
-                              "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin"};
+                "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin"};
         String[] domains = {"gmail.com", "yahoo.com", "outlook.com", "company.com", "mail.com", "example.com", "test.com", "domain.com"};
 
         for (int i = 0; i < count; i++) {
