@@ -3,6 +3,7 @@ package com.rhb.ams.service;
 import com.rhb.ams.dto.*;
 import com.rhb.ams.entity.Account;
 import com.rhb.ams.entity.Customer;
+import com.rhb.ams.exception.ResourceNotFoundException;
 import com.rhb.ams.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
@@ -83,8 +84,8 @@ public class CustomerService {
     }
 
     public CustomerWithAccountsDTO getCustomerWithAccounts(Long customerId) {
-        Customer customer = customerRepository.findCustomerWithAccounts(customerId).get();
-              //  .orElseThrow(() -> new ResourceNotFoundException("Customer not found with ID: " + customerId));
+        Customer customer = customerRepository.findCustomerWithAccounts(customerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer", "id", customerId));
 
         List<AccountSummaryDTO> accounts = customer.getAccounts()
                 .stream()

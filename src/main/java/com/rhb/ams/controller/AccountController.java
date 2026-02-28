@@ -29,12 +29,8 @@ public class AccountController {
      */
     @PostMapping
     public ResponseEntity<AccountResponseDTO> createAccount(@Valid @RequestBody AccountRequestDTO accountRequestDTO) {
-        try {
-            AccountResponseDTO createdAccount = accountService.createAccount(accountRequestDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        AccountResponseDTO createdAccount = accountService.createAccount(accountRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
     }
 
     /**
@@ -70,13 +66,9 @@ public class AccountController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<AccountResponseDTO> updateAccount(@PathVariable Long id, @Valid @RequestBody AccountRequestDTO accountRequestDTO) {
-        try {
-            return accountService.updateAccount(id, accountRequestDTO)
-                    .map(ResponseEntity::ok)
-                    .orElseGet(() -> ResponseEntity.notFound().build());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return accountService.updateAccount(id, accountRequestDTO)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**

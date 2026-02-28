@@ -5,6 +5,7 @@ import com.rhb.ams.dto.AccountResponseDTO;
 import com.rhb.ams.dto.CustomerResponseDTO;
 import com.rhb.ams.entity.Account;
 import com.rhb.ams.entity.Customer;
+import com.rhb.ams.exception.ResourceNotFoundException;
 import com.rhb.ams.repository.AccountRepository;
 import com.rhb.ams.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class AccountService {
      */
     public AccountResponseDTO createAccount(AccountRequestDTO accountRequestDTO) {
         Customer customer = customerRepository.findById(accountRequestDTO.getCustomerId())
-                .orElseThrow(() -> new IllegalArgumentException("Customer not found with ID: " + accountRequestDTO.getCustomerId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer", "id", accountRequestDTO.getCustomerId()));
 
         Account account = Account.builder()
                 .accountNumber(generateAccountNumber())
@@ -78,7 +79,7 @@ public class AccountService {
             }
             if (accountRequestDTO.getCustomerId() != null) {
                 Customer customer = customerRepository.findById(accountRequestDTO.getCustomerId())
-                        .orElseThrow(() -> new IllegalArgumentException("Customer not found with ID: " + accountRequestDTO.getCustomerId()));
+                        .orElseThrow(() -> new ResourceNotFoundException("Customer", "id", accountRequestDTO.getCustomerId()));
                 existingAccount.setCustomer(customer);
             }
             Account updatedAccount = accountRepository.save(existingAccount);
@@ -89,7 +90,7 @@ public class AccountService {
     /**
      * Delete an account by ID
      *
-     * @param accountNumber Account ID
+     * @param id ID
      */
     public void deleteAccount(Long id) {
         accountRepository.deleteById(id);
