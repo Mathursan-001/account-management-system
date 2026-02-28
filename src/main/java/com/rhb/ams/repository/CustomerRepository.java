@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
@@ -32,4 +33,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
             @Param("toDate") LocalDateTime toDate,
             Pageable pageable
     );
+
+    @Query("SELECT c FROM Customer c LEFT JOIN FETCH c.accounts WHERE c.id = :customerId")
+    Optional<Customer> findCustomerWithAccounts(@Param("customerId") Long customerId);
+
 }

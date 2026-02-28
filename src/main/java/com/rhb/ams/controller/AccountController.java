@@ -82,27 +82,13 @@ public class AccountController {
     /**
      * Delete an account by account number
      *
-     * @param accountNumber Account number (e.g., ACC12345678)
+     * @param id
      * @return 204 No Content if successful, 404 if not found
      */
-    @DeleteMapping("/{accountNumber}")
-    public ResponseEntity<Void> deleteAccount(@PathVariable String accountNumber) {
-        accountService.deleteAccount(accountNumber);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAccount(@PathVariable Long id) {
+        accountService.deleteAccount(id);
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Get all accounts for a specific customer (Join endpoint)
-     *
-     * @param customerId Customer ID
-     * @return List of account response DTOs for the customer
-     */
-    @GetMapping("/customer/{customerId}")
-    public ResponseEntity<List<AccountResponseDTO>> getAccountsByCustomerId(@PathVariable Long customerId) {
-        List<AccountResponseDTO> accounts = accountService.getAccountsByCustomerId(customerId);
-        if (accounts.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(accounts);
-    }
 }

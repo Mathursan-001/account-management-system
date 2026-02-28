@@ -60,13 +60,13 @@ public class AccountService {
      * @return Optional containing the account response DTO if found
      */
     public Optional<AccountResponseDTO> getAccountByAccountNumber(String accountNumber) {
-         return accountRepository.findByAccountNumber(accountNumber).map(this::convertToResponseDTO);
+        return accountRepository.findByAccountNumber(accountNumber).map(this::convertToResponseDTO);
     }
 
     /**
      * Update an existing account
      *
-     * @param id                  Account ID
+     * @param id                Account ID
      * @param accountRequestDTO Account updated data
      * @return Updated account response DTO
      */
@@ -91,20 +91,8 @@ public class AccountService {
      *
      * @param accountNumber Account ID
      */
-    public void deleteAccount(String accountNumber) {
-        accountRepository.deleteByAccountNumber(accountNumber);
-    }
-
-    /**
-     * Find all accounts belonging to a specific customer
-     *
-     * @param customerId The ID of the customer
-     * @return List of account response DTOs for the customer
-     */
-    public List<AccountResponseDTO> getAccountsByCustomerId(Long customerId) {
-        return accountRepository.findByCustomerId(customerId).stream()
-                .map(this::convertToResponseDTO)
-                .collect(Collectors.toList());
+    public void deleteAccount(Long id) {
+        accountRepository.deleteById(id);
     }
 
     /**
@@ -114,18 +102,11 @@ public class AccountService {
      * @return AccountResponseDTO
      */
     private AccountResponseDTO convertToResponseDTO(Account account) {
-        CustomerResponseDTO customerDTO = CustomerResponseDTO.builder()
-                .id(account.getCustomer().getId())
-                .name(account.getCustomer().getName())
-                .email(account.getCustomer().getEmail())
-                .createdAt(account.getCustomer().getCreatedAt())
-                .build();
-
         return AccountResponseDTO.builder()
                 .id(account.getId())
                 .accountNumber(account.getAccountNumber())
                 .balance(account.getBalance())
-                .customer(customerDTO)
+                .customerId(account.getCustomer().getId())
                 .build();
     }
 

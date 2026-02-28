@@ -1,8 +1,6 @@
 package com.rhb.ams.controller;
 
-import com.rhb.ams.dto.CustomerRequestDTO;
-import com.rhb.ams.dto.CustomerResponseDTO;
-import com.rhb.ams.dto.PageResponseDTO;
+import com.rhb.ams.dto.*;
 import com.rhb.ams.service.CustomerService;
 
 import lombok.RequiredArgsConstructor;
@@ -104,6 +102,21 @@ public class CustomerController {
         return customerService.updateCustomer(id, customerRequestDTO)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Get all accounts for a specific customer (Join endpoint)
+     *
+     * @param customerId Customer ID
+     * @return List of account response DTOs for the customer
+     */
+    @GetMapping("/with-accounts/{customerId}")
+    public ResponseEntity<CustomerWithAccountsDTO> getAccountsByCustomerId(@PathVariable Long customerId) {
+        CustomerWithAccountsDTO customer = customerService.getCustomerWithAccounts(customerId);
+        if (customer.getAccounts().isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(customer);
     }
 
     /**

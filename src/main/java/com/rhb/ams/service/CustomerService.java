@@ -1,8 +1,7 @@
 package com.rhb.ams.service;
 
-import com.rhb.ams.dto.CustomerRequestDTO;
-import com.rhb.ams.dto.CustomerResponseDTO;
-import com.rhb.ams.dto.ExternalResponseDTO;
+import com.rhb.ams.dto.*;
+import com.rhb.ams.entity.Account;
 import com.rhb.ams.entity.Customer;
 import com.rhb.ams.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
@@ -81,6 +80,22 @@ public class CustomerService {
             Customer updatedCustomer = customerRepository.save(existingCustomer);
             return convertToResponseDTO(updatedCustomer);
         });
+    }
+
+    public CustomerWithAccountsDTO getCustomerWithAccounts(Long customerId) {
+        Customer customer = customerRepository.findCustomerWithAccounts(customerId).get();
+              //  .orElseThrow(() -> new ResourceNotFoundException("Customer not found with ID: " + customerId));
+
+        List<AccountSummaryDTO> accounts = customer.getAccounts()
+                .stream()
+                .map(account -> new AccountSummaryDTO(account.getId(), account.getAccountNumber(), account.getBalance()))
+                .toList();
+
+        return new CustomerWithAccountsDTO(
+                customer.getId(),
+                customer.getName(),
+                accounts
+        );
     }
 
     /**
