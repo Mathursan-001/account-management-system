@@ -45,14 +45,14 @@ public class AccountController {
     }
 
     /**
-     * Get account by ID
+     * Get account by number
      *
-     * @param id Account ID
+     * @pathVariable accountNumber Account number
      * @return Account response DTO if found, otherwise 404
      */
     @GetMapping("/{id}")
-    public ResponseEntity<AccountResponseDTO> getAccountById(@PathVariable String id) {
-        return accountService.getAccountByAccountNumber(id)
+    public ResponseEntity<AccountResponseDTO> getAccountByNumber(@PathVariable String accountNumber) {
+        return accountService.getAccountByAccountNumber(accountNumber)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

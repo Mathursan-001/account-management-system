@@ -285,13 +285,13 @@ http://localhost:8080/api/v1
 
 ### Account Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/accounts` | Get all accounts |
-| POST | `/accounts` | Create new account |
-| GET | `/accounts/{id}` | Get account by ID |
-| PUT | `/accounts/{id}` | Update account |
-| DELETE | `/accounts/{id}` | Delete account |
+| Method | Endpoint                    | Description                   |
+|--------|-----------------------------|-------------------------------|
+| GET | `/accounts`                 | Get all accounts              |
+| POST | `/accounts`                 | Create new account            |
+| GET | `/accounts/{accountNumber}` | Get account by Account Number |
+| PUT | `/accounts/{id}`            | Update account                |
+| DELETE | `/accounts/{id}`            | Delete account                |
 
 ### Health & Utility Endpoints
 
