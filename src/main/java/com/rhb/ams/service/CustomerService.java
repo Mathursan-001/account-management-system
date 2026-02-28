@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import tools.jackson.databind.JsonNode;
 
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalUnit;
 import java.util.*;
 
 @Service
@@ -106,16 +107,24 @@ public class CustomerService {
                 "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin"};
         String[] domains = {"gmail.com", "yahoo.com", "outlook.com", "company.com", "mail.com", "example.com", "test.com", "domain.com"};
 
+        LocalDateTime[] randomDates = new LocalDateTime[5];
+
+        for (int i = 0; i < 5; i++) {
+            LocalDateTime date = LocalDateTime.now().minusDays(i);
+            randomDates[i] = date;
+        }
+
         for (int i = 0; i < count; i++) {
             String firstName = firstNames[random.nextInt(firstNames.length)];
             String lastName = lastNames[random.nextInt(lastNames.length)];
             String name = firstName + " " + lastName;
             String email = (firstName.toLowerCase() + "." + lastName.toLowerCase() + i + "@" + domains[random.nextInt(domains.length)]);
+            LocalDateTime createdAt = randomDates[random.nextInt(randomDates.length)];
 
             Customer customer = Customer.builder()
                     .name(name)
                     .email(email)
-                    .createdAt(LocalDateTime.now())
+                    .createdAt(createdAt)
                     .build();
 
             customersToSave.add(customer);

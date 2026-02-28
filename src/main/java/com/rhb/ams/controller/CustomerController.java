@@ -2,6 +2,7 @@ package com.rhb.ams.controller;
 
 import com.rhb.ams.dto.CustomerRequestDTO;
 import com.rhb.ams.dto.CustomerResponseDTO;
+import com.rhb.ams.dto.PageResponseDTO;
 import com.rhb.ams.service.CustomerService;
 
 import lombok.RequiredArgsConstructor;
@@ -9,13 +10,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -24,7 +30,7 @@ import java.util.List;
 public class CustomerController {
 
     private final CustomerService customerService;
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
 
 
     /**
@@ -64,30 +70,32 @@ public class CustomerController {
      * @return Page of customers matching the criteria
      */
     @GetMapping("/search")
-    public ResponseEntity<Page<CustomerResponseDTO>> searchCustomers(
+    public ResponseEntity<PageResponseDTO<CustomerResponseDTO>> searchCustomers(
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) String fromDate,
-            @RequestParam(required = false) String toDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
             @PageableDefault(size = 20, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        LocalDateTime fromDateTime = null;
-        LocalDateTime toDateTime = null;
+        LocalDateTime fromDateTime = fromDate != null ? fromDate.atStartOfDay() : null;
+        LocalDateTime toDateTime = toDate != null ? toDate.atTime(LocalTime.MAX) : null;
 
-        if (fromDate != null && !fromDate.isEmpty()) {
-            fromDateTime = LocalDateTime.parse(fromDate, formatter);
-        }
-        if (toDate != null && !toDate.isEmpty()) {
-            toDateTime = LocalDateTime.parse(toDate, formatter);
-        }
+        Page<CustomerResponseDTO> pageResult = customerService.searchCustomers(name, fromDateTime, toDateTime, pageable);
 
-        Page<CustomerResponseDTO> customers = customerService.searchCustomers(name, fromDateTime, toDateTime, pageable);
-        return ResponseEntity.ok(customers);
+        return ResponseEntity.ok(
+                PageResponseDTO.<CustomerResponseDTO>builder()
+                        .customers(pageResult.getContent())
+                        .page(pageResult.getNumber())
+                        .size(pageResult.getSize())
+                        .totalElements(pageResult.getTotalElements())
+                        .totalPages(pageResult.getTotalPages())
+                        .build()
+        );
     }
 
     /**
      * Update an existing customer
      *
-     * @param id                   Customer ID
+     * @param id                 Customer ID
      * @param customerRequestDTO Customer request data transfer object
      * @return Updated customer response DTO if found, otherwise 404
      */
@@ -106,15 +114,12 @@ public class CustomerController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
-        if (customerService.getCustomerById(id).isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
         customerService.deleteCustomer(id);
         return ResponseEntity.noContent().build();
     }
 
     /**
-     * Generate hundreds of random customers
+     * Generate hundreds of random customers - util endpoint for demo purpose
      *
      * @param count Number of random customers to generate (default: 100, max: 1000)
      * @return List of created customer response DTOs with HTTP 201
