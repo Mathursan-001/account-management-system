@@ -4,7 +4,6 @@ import com.rhb.ams.dto.AccountRequestDTO;
 import com.rhb.ams.dto.AccountResponseDTO;
 import com.rhb.ams.entity.Account;
 import com.rhb.ams.entity.Customer;
-import com.rhb.ams.exception.ResourceNotFoundException;
 import com.rhb.ams.repository.AccountRepository;
 import com.rhb.ams.repository.CustomerRepository;
 import org.junit.jupiter.api.BeforeEach;

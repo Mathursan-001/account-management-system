@@ -3,7 +3,6 @@ package com.rhb.ams.controller;
 import com.rhb.ams.dto.*;
 import com.rhb.ams.service.CustomerService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,7 +13,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 

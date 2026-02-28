@@ -57,7 +57,7 @@ class CustomerServiceTest {
                 .name("John Doe")
                 .email("john@example.com")
                 .createdAt(LocalDateTime.now())
-                .accounts(Arrays.asList())
+                .accounts(List.of())
                 .build();
 
         // Setup request DTO
