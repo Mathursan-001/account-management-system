@@ -1,10 +1,16 @@
 # AMS - Account Management System
 
-A Spring Boot application for managing accounts with REST API endpoints, built with modern Java technologies.
+A Spring Boot application for managing accounts with REST API endpoints, built with modern Java technologies and comprehensive exception handling, testing, and logging.
 
 ## Project Overview
 
-This is a Spring Boot 4.0.3 application that provides account management functionality. The system leverages JPA for data persistence, H2 as an embedded database, and includes comprehensive validation and testing capabilities.
+This is a Spring Boot 4.0.3 application that provides robust account management functionality. The system leverages:
+- **JPA** for data persistence with H2 as an embedded database
+- **Global exception handling** with standardized error responses
+- **Comprehensive testing** using JUnit 5, Mockito, and Spring Test
+- **AOP-based logging** for cross-cutting concerns
+- **Bean validation** with detailed error messages
+- **Builder patterns** (Lombok) for clean object creation
 
 ## Technology Stack
 
@@ -13,9 +19,11 @@ This is a Spring Boot 4.0.3 application that provides account management functio
 - **Build Tool**: Maven
 - **Database**: H2 (Embedded)
 - **ORM**: Spring Data JPA
-- **Validation**: Spring Validation
-- **Utilities**: Lombok (reduces boilerplate code)
-- **Testing**: Spring Boot Test Suite
+- **Validation**: Jakarta Bean Validation (Spring Validation)
+- **Utilities**: Lombok (code generation - @Builder, @Data, etc.)
+- **Testing**: JUnit 5, Mockito, Spring Boot Test Suite
+- **AOP**: Spring AOP for logging and cross-cutting concerns
+- **API Documentation**: Comprehensive guides for testing and exception handling
 
 ## Project Structure
 
@@ -24,18 +32,65 @@ ams/
 ├── src/
 │   ├── main/
 │   │   ├── java/com/rhb/ams/
-│   │   │   └── AmsApplication.java
+│   │   │   ├── AmsApplication.java              # Main Spring Boot application
+│   │   │   ├── config/
+│   │   │   │   ├── WebClientConfig.java         # WebClient configuration
+│   │   │   │   └── LoggingAspectConfig.java     # AOP logging configuration
+│   │   │   ├── controller/
+│   │   │   │   ├── AccountController.java
+│   │   │   │   ├── CustomerController.java
+│   │   │   │   ├── ExternalCallController.java
+│   │   │   │   └── HealthController.java
+│   │   │   ├── service/
+│   │   │   │   ├── AccountService.java
+│   │   │   │   ├── CustomerService.java
+│   │   │   │   └── ExternalService.java
+│   │   │   ├── repository/
+│   │   │   │   ├── AccountRepository.java
+│   │   │   │   └── CustomerRepository.java
+│   │   │   ├── entity/
+│   │   │   │   ├── Account.java
+│   │   │   │   └── Customer.java
+│   │   │   ├── dto/
+│   │   │   │   ├── AccountRequestDTO.java
+│   │   │   │   ├── AccountResponseDTO.java
+│   │   │   │   ├── CustomerRequestDTO.java
+│   │   │   │   ├── CustomerResponseDTO.java
+│   │   │   │   ├── ErrorResponseDTO.java
+│   │   │   │   └── ... (other DTOs)
+│   │   │   └── exception/
+│   │   │       ├── GlobalExceptionHandler.java   # Central exception handling
+│   │   │       ├── ResourceNotFoundException.java
+│   │   │       ├── DuplicateResourceException.java
+│   │   │       ├── InvalidRequestException.java
+│   │   │       ├── ExternalServiceException.java
+│   │   │       └── DatabaseException.java
 │   │   └── resources/
 │   │       ├── application.properties
 │   │       ├── static/
 │   │       └── templates/
 │   └── test/
 │       └── java/com/rhb/ams/
+│           ├── service/
+│           │   ├── AccountServiceTest.java
+│           │   └── CustomerServiceTest.java
+│           ├── controller/
+│           │   ├── AccountControllerTest.java
+│           │   └── CustomerControllerTest.java
+│           ├── exception/
+│           │   └── GlobalExceptionHandlerTest.java
 │           └── AmsApplicationTests.java
 ├── pom.xml
 ├── mvnw
 ├── mvnw.cmd
-└── README.md
+├── README.md
+├── EXCEPTION_HANDLER.md          # Exception handling guide
+├── TESTING_GUIDE.md              # Comprehensive testing guide
+├── IMPLEMENTATION.md             # Implementation details
+├── IMPLEMENTATION_SUMMARY.md     # Summary of what was implemented
+├── DTO_GUIDE.md                  # DTOs and validation guide
+├── API_REFERENCE.md              # API endpoint reference
+└── HELP.md                        # Getting started help
 ```
 
 ## Prerequisites
@@ -103,16 +158,73 @@ Access the H2 Database Console at: `http://localhost:8080/h2-console`
 
 ### Core Dependencies
 - `spring-boot-starter-webmvc` - Web and MVC support
-- `spring-boot-starter-data-jpa` - JPA/Hibernate
-- `spring-boot-starter-validation` - Bean validation
-- `h2` - Embedded database
-- `lombok` - Code generation library
+- `spring-boot-starter-data-jpa` - JPA/Hibernate for ORM
+- `spring-boot-starter-validation` - Bean validation with Jakarta Validation
+- `spring-boot-starter-aop` - Aspect-Oriented Programming support for cross-cutting concerns
+- `spring-boot-starter-webflux` - Reactive web support for external service calls
+- `h2` - Embedded relational database
+- `lombok` - Code generation library (Builders, Getters/Setters, etc.)
 
 ### Test Dependencies
-- `spring-boot-starter-data-jpa-test`
-- `spring-boot-starter-validation-test`
-- `spring-boot-starter-webmvc-test`
+- `spring-boot-starter-data-jpa-test` - JPA testing utilities
+- `spring-boot-starter-validation-test` - Validation testing
+- `spring-boot-starter-webmvc-test` - MockMvc and web testing
+- JUnit 5 (included with Spring Boot Test)
+- Mockito (included with Spring Boot Test)
 
+## Exception Handling
+
+The application implements a **global exception handling** strategy using Spring's `@ControllerAdvice` annotation for centralized error management.
+
+### Features
+- ✅ Automatic HTTP status code mapping
+- ✅ Unique trace IDs for error tracking
+- ✅ Field-level validation error details
+- ✅ Comprehensive logging integration with AOP
+
+### Custom Exceptions
+
+| Exception | HTTP Status | Use Case |
+|-----------|------------|----------|
+| `ResourceNotFoundException` | 404 | Resource doesn't exist |
+| `DuplicateResourceException` | 409 | Attempting to create duplicate |
+| `InvalidRequestException` | 400 | Invalid input or business rule violation |
+| `ExternalServiceException` | 502 | External API call failed |
+
+### Error Response Format
+
+All error responses follow a standardized structure:
+
+```json
+{
+    "status": 404,
+    "message": "Customer not found with id : '999'",
+    "error": "Resource Not Found",
+    "timestamp": "2026-02-28T10:30:45.123456",
+    "path": "/api/v1/customers/999",
+    "fieldErrors": {
+        "email": "Customer email should be valid"
+    },
+    "traceId": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+### Validation Errors
+
+Validation errors include field-level details:
+
+```json
+{
+    "status": 400,
+    "message": "Validation failed",
+    "error": "Validation Error",
+    "fieldErrors": {
+        "name": "Customer name is required",
+        "email": "Customer email should be valid"
+    },
+    "traceId": "550e8400-e29b-41d4-a716-446655440001"
+}
+```
 ## Database Schema
 
 ### Entity Models
@@ -143,19 +255,6 @@ Represents a bank account associated with a customer.
 **Relationships:**
 - Many-to-One: Account → Customer (many accounts belong to one customer)
 
-### Entity Diagram
-
-```
-┌─────────────────┐         ┌──────────────────┐
-│    CUSTOMER     │ 1    *  │      ACCOUNT     │
-├─────────────────┤────────┤──────────────────┤
-│ id (PK)         │        │ id (PK)          │
-│ name            │        │ accountNumber    │
-│ email           │        │ balance          │
-│ createdAt       │        │ customerId (FK)  │
-└─────────────────┘        └──────────────────┘
-```
-
 ## API Endpoints
 
 The application provides versioned REST API endpoints for account management. The current version is **v1**.
@@ -166,79 +265,71 @@ http://localhost:8080/api/v1
 ```
 
 ### Customer Endpoints
-```
-POST   /api/v1/customers                 - Create new customer
-GET    /api/v1/customers/{id}            - Get customer by ID
-GET    /api/v1/customers/search          - Search customers with optional filters
-PUT    /api/v1/customers/{id}            - Update customer
-DELETE /api/v1/customers/{id}            - Delete customer
-```
 
-**Customer Search Query Parameters (Optional):**
-- `name` - Filter by customer name (supports partial matching)
-- `fromDate` - Filter customers created from this date (format: yyyy-MM-dd or yyyy-MM-dd'T'HH:mm:ss)
-- `toDate` - Filter customers created until this date (format: yyyy-MM-dd or yyyy-MM-dd'T'HH:mm:ss)
-- `page` - Zero-indexed page number (default: 0)
-- `size` - Number of records per page (default: 20)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/customers` | Create new customer |
+| GET | `/customers/{id}` | Get customer by ID |
+| GET | `/customers/search` | Search customers with filters and pagination |
+| GET | `/customers/with-accounts/{customerId}` | Get customer with all accounts |
+| PUT | `/customers/{id}` | Update customer |
+| DELETE | `/customers/{id}` | Delete customer |
+| POST | `/customers/generate-random` | Generate random customers (demo) |
 
-**Customer Search Examples:**
-```
-GET /api/v1/customers/search?name=John&page=0&size=10
-GET /api/v1/customers/search?fromDate=2025-01-01&toDate=2026-12-31
-GET /api/v1/customers/search?name=John&fromDate=2025-06-01&toDate=2026-02-27&sort=createdAt,desc
-GET /api/v1/customers/search?page=0&size=20&sort=name,asc
-```
+**Query Parameters:**
+- `name` - Filter by customer name (partial match)
+- `fromDate` - Filter from date (yyyy-MM-dd)
+- `toDate` - Filter to date (yyyy-MM-dd)
+- `page` - Page number (default: 0)
+- `size` - Records per page (default: 20)
 
 ### Account Endpoints
-```
-GET    /api/v1/accounts                  - Get all accounts
-POST   /api/v1/accounts                  - Create new account
-GET    /api/v1/accounts/{id}             - Get account by ID
-PUT    /api/v1/accounts/{id}             - Update account
-DELETE /api/v1/accounts/{id}             - Delete account
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/accounts` | Get all accounts |
+| POST | `/accounts` | Create new account |
+| GET | `/accounts/{id}` | Get account by ID |
+| PUT | `/accounts/{id}` | Update account |
+| DELETE | `/accounts/{id}` | Delete account |
+
+### Health & Utility Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/health` | Application health status |
+| GET | `/api/v1/objects` | Call external JSONPlaceholder API |
+
+### Example Request/Response
+
+**Create Customer:**
+```bash
+curl -X POST http://localhost:8080/api/v1/customers \
+  -H "Content-Type: application/json" \
+  -d '{"name":"John Doe","email":"john@example.com"}'
 ```
 
-### Customer-Account Join Endpoint
-```
-GET    /api/v1/customers/{customerId}/accounts - Get all accounts for a specific customer
-```
-
-**Description:** Retrieves all accounts belonging to a specific customer by joining the Customer and Account tables.
-
-**Path Parameter:**
-- `customerId` - The ID of the customer (required)
-
-**Response Example:**
+**Response (201 Created):**
 ```json
-[
-  {
-    "id": 1,
-    "accountNumber": "ACC001",
-    "balance": 5000.00,
-    "customer": {
-      "id": 1,
-      "name": "John Doe",
-      "email": "john@example.com",
-      "createdAt": "2025-12-15T10:30:00"
-    }
-  },
-  {
-    "id": 2,
-    "accountNumber": "ACC002",
-    "balance": 10000.00,
-    "customer": {
-      "id": 1,
-      "name": "John Doe",
-      "email": "john@example.com",
-      "createdAt": "2025-12-15T10:30:00"
-    }
-  }
-]
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john@example.com",
+  "createdAt": "2026-02-28T10:30:45"
+}
 ```
 
-**Example Requests:**
-```
-GET /api/v1/customers/1/accounts
+**Error Response (400 Bad Request):**
+```json
+{
+  "status": 400,
+  "message": "Validation failed",
+  "error": "Validation Error",
+  "fieldErrors": {
+    "email": "Customer email should be valid"
+  },
+  "traceId": "550e8400-e29b-41d4-a716-446655440001"
+}
 ```
 
 ## API Versioning
@@ -246,28 +337,10 @@ GET /api/v1/customers/1/accounts
 This API uses URL-based versioning to ensure backward compatibility and smooth API evolution.
 
 - **Current Version**: v1
-- **Version Format**: `/api/v{major}.{minor}` or `/api/v{major}`
-- **Deprecation Policy**: Older API versions will be maintained for at least 2 minor releases before deprecation
+- **Version Format**:  `/api/v{major}`
 
 ### Version History
 - **v1** - Initial release (Current)
-
-## Development
-
-### Code Style
-This project uses Lombok to reduce boilerplate code. Key Lombok annotations:
-- `@Data` - Generates getters, setters, equals, hashCode, and toString
-- `@Entity` - JPA entity annotation
-- `@Repository` - Spring Data repository interface
-
-### Testing
-
-Run tests with:
-```bash
-mvnw test
-```
-
-Test files are located in `src/test/java/com/rhb/ams/`
 
 ## Build and Deployment
 
@@ -282,24 +355,14 @@ target/ams-0.0.1-SNAPSHOT.jar
 - `spring-boot-maven-plugin` - Creates executable JAR
 - `maven-compiler-plugin` - Configured with Lombok annotation processor
 
-## Contributing
 
-1. Create a feature branch from `main`
-2. Make your changes
-3. Write/update tests
-4. Submit a pull request
+## Support & Resources
 
-## License
+For issues or questions, please refer to:
 
-This project is provided as-is for portfolio purposes.
-
-## Support
-
-For issues or questions, please refer to the official Spring Boot documentation:
+**Official Documentation:**
 - [Spring Boot Documentation](https://spring.io/projects/spring-boot)
 - [Spring Data JPA Guide](https://spring.io/projects/spring-data-jpa)
-
----
-
-**Version**: 0.0.1-SNAPSHOT  
-**Last Updated**: February 2026
+- [Spring AOP Documentation](https://docs.spring.io/spring-framework/reference/core/aop.html)
+- [JUnit 5 User Guide](https://junit.org/junit5/docs/current/user-guide/)
+- [Mockito Documentation](https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html)
